@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     private final AuthService authService;
 
-    @PostMapping("/resister")
+    @PostMapping("/register")
     public ResponseEntity<String>resister(@RequestBody AuthRequest request){
         authService.register(request);
         return ResponseEntity.ok("회원가입 성공");
