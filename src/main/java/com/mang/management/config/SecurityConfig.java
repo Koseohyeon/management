@@ -32,10 +32,12 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 설정 적용
                 .csrf(csrf -> csrf.disable()) // CSRF 비활성화 (JWT를 사용하기 때문에 필요 없음)
                 .authorizeHttpRequests(auth->auth
-                        .requestMatchers("/api/auth/**").permitAll() // /auth/** 엔드포인트는 인증 없이 접근 가능
+                        .requestMatchers("/api/auth/**","/api/boards/**","/ws/**").permitAll() // /auth/** 엔드포인트는 인증 없이 접근 가능
                         .anyRequest().authenticated()// 나머지 요청은 인증 필요
                 )
-                .sessionManagement(sess->sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));// 세션 사용하지 않
+                .sessionManagement(sess->sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))// 세션 사용하지 않음
+                .headers(headers->headers.frameOptions(frame->frame.sameOrigin()));// WebSocket 허용
+
 
         return http.build();
 
@@ -60,12 +62,5 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    /*@Bean
-    public AuthenticationManager authenticationManager() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return new ProviderManager(List.of(authProvider));
-    }*/
 
 }
