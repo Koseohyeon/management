@@ -3,8 +3,6 @@ package com.mang.management.member.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import javax.management.relation.Role;
-
 @Entity
 @Getter
 @Setter
@@ -21,5 +19,9 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role; // 기본값 USER
 
 }
