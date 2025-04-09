@@ -23,28 +23,22 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 
         if (request instanceof ServletServerHttpRequest servletRequest) {
             HttpServletRequest httpServletRequest = servletRequest.getServletRequest();
-            String token = httpServletRequest.getHeader("Authorization");
+            String token = httpServletRequest.getParameter("token"); // ✅ 쿼리 파라미터로부터 token 추출
 
-            if (token == null || !token.startsWith("Bearer ")) {
-                return false;  // ❌ 토큰이 없거나 잘못된 형식이면 연결 차단
-            }
-
-            token = token.substring(7);
-
-            if (jwtUtil.validateToken(token)) {
+            if (token != null && jwtUtil.validateToken(token)) {
                 String email = jwtUtil.extractEmail(token);
-                String role = jwtUtil.getRoleFromToken(token);
-                attributes.put("email", email);
-                attributes.put("role", role);
+                attributes.put("email", email); // 필요 시 저장
                 return true;
             }
         }
 
-        return false;  // ❌ JWT 검증 실패 시 연결 차단
+        return false; // 토큰이 없거나 유효하지 않으면 연결 거부
     }
 
     @Override
-    public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Exception exception) {
-        // 필요 시 후처리 가능
+    public void afterHandshake(ServerHttpRequest request,
+                               ServerHttpResponse response,
+                               WebSocketHandler wsHandler,
+                               Exception exception) {
     }
 }
