@@ -56,4 +56,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
         return null;
     }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        return path.startsWith("/ws");  // WebSocket 연결은 필터링하지 않음
+    }
 }

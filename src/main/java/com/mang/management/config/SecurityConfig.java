@@ -44,7 +44,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 설정
                 .csrf(csrf -> csrf.disable()) // CSRF 비활성화 (JWT 사용 시 필요 없음)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll() // 인증 없이 접근 가능
+                        .requestMatchers("/api/auth/**","/ws/**","/ws/info/**").permitAll() // 인증 없이 접근 가능
                         .anyRequest().authenticated() // 그 외 요청은 인증 필요
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 비활성화
