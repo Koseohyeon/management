@@ -30,11 +30,14 @@ public class FocusSession {
 
     private String memo;
 
-   /* public void calculateTotalMinutes() {
+    @PrePersist
+    @PreUpdate
+    public void calculateTotalMinutes() {
         if (startTime != null && endTime != null) {
-            this.totalMinutes = Duration.between(startTime, endTime).toMinutes();
+            long seconds = Duration.between(startTime, endTime).getSeconds();
+            this.totalMinutes = seconds;
         }
-    }*/
+    }
 }
 
 

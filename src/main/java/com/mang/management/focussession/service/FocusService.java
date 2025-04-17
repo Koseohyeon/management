@@ -32,16 +32,19 @@ public class FocusService {
         if (request.getStartTime() == null || request.getEndTime() == null) {
             throw new IllegalArgumentException("시작 시간과 종료 시간은 필수입니다.");
         }
-
-        long totalMinutes = Duration.between(request.getStartTime(), request.getEndTime()).toMinutes();
+        // 이제 totalMinutes는 @PrePersist에서 자동 계산됨
+       // long totalMinutes = Duration.between(request.getStartTime(), request.getEndTime()).toMinutes();
 
         FocusSession session = FocusSession.builder()
                 .user(user)
                 .startTime(request.getStartTime())
                 .endTime(request.getEndTime())
-                .totalMinutes(totalMinutes)
+               // .totalMinutes(totalMinutes)
                 .memo(request.getMemo())
                 .build();
+
+       // session.calculateTotalMinutes(); // ✅ 자동 계산 추가
+
 
         focusSessionRepository.save(session);
     }
