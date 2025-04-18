@@ -11,16 +11,23 @@ import java.util.List;
 public interface FocusSessionRepository extends JpaRepository<FocusSession, Long> {
     List<FocusSession> findByUserIdAndStartTimeBetween(Long userId, LocalDateTime start, LocalDateTime end);
 
-    @Query("SELECT fs.startTime, SUM(fs.totalMinutes) " +
+    @Query("SELECT FUNCTION('DATE', fs.startTime), SUM(fs.totalMinutes) " +
             "FROM FocusSession fs " +
-            "WHERE fs.user = :userId " +
-            "GROUP BY fs.startTime")
+            "WHERE fs.user.id = :userId " +
+            "GROUP BY FUNCTION('DATE', fs.startTime)")
     List<Object[]> findDailyTotalByUser(@Param("userId") Long userId);
 
-    @Query("SELECT fs.startTime, SUM(fs.totalMinutes) as total " +
+    @Query("SELECT FUNCTION('DATE', fs.startTime), SUM(fs.totalMinutes) as total " +
             "FROM FocusSession fs " +
-            "WHERE fs.user = :userId " +
-            "GROUP BY fs.startTime " +
+            "WHERE fs.user.id = :userId " +
+            "GROUP BY FUNCTION('DATE', fs.startTime) " +
             "ORDER BY total DESC")
     List<Object[]> findLongestFocusDay(@Param("userId") Long userId);
+
+    @Query("SELECT FUNCTION('DATE', fs.startTime), SUM(fs.totalMinutes) as total " +
+            "FROM FocusSession fs " +
+            "WHERE fs.user.id = :userId " +
+            "GROUP BY FUNCTION('DATE', fs.startTime) " +
+            "ORDER BY total ASC")
+    List<Object[]> findShortestFocusDay(@Param("userId") Long userId);
 }

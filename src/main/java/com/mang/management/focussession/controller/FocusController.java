@@ -37,5 +37,11 @@ public class FocusController {
     public ResponseEntity<?> getLongest(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.ok(focusService.getLongestFocusDay(userDetails.getId()));
     }
+
+    @GetMapping("/shortest")
+    public ResponseEntity<?> getShortest(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(focusService.getShortestFocusDay(userDetails.getId()));
+    }
+
 }
 

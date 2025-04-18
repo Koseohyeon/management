@@ -34,8 +34,10 @@ public class FocusSession {
     @PreUpdate
     public void calculateTotalMinutes() {
         if (startTime != null && endTime != null) {
-            long seconds = Duration.between(startTime, endTime).getSeconds();
-            this.totalMinutes = seconds;
+            long minutes = Duration.between(startTime, endTime).toMinutes();
+            this.totalMinutes = minutes;
+
+
         }
     }
 }
