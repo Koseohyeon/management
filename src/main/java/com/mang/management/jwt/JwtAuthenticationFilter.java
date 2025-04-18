@@ -3,6 +3,7 @@ package com.mang.management.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mang.management.member.dto.AuthRequest;
 import com.mang.management.member.dto.AuthResponse;
+import com.mang.management.member.entity.Role;
 import com.mang.management.member.entity.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -39,8 +40,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult)
             throws IOException, ServletException {
 
-        User user = (User) authResult.getPrincipal();
-        String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+        CustomUserDetails userDetails = (CustomUserDetails) authResult.getPrincipal();
+        // 문자열로 된 role을 Role enum으로 변환
+        Role role = Role.valueOf(userDetails.getRole());
+        String token =jwtUtil.generateToken(userDetails.getEmail(),role);
+
 
         response.addHeader("Authorization", "Bearer " + token);
         response.setContentType("application/json");

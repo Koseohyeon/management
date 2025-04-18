@@ -40,16 +40,20 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
+        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, jwtUtil);
+        jwtAuthenticationFilter.setFilterProcessesUrl("/api/auth/login");
+
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 설정
                 .csrf(csrf -> csrf.disable()) // CSRF 비활성화 (JWT 사용 시 필요 없음)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**","/ws/**","/ws/info/**").permitAll() // 인증 없이 접근 가능
+                        .requestMatchers("/api/auth/**").permitAll() // 인증 없이 접근 가능
+                        .requestMatchers("/api/focus/save").authenticated()
                         .anyRequest().authenticated() // 그 외 요청은 인증 필요
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 비활성화
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin())) // WebSocket 허용
-                .addFilter(new JwtAuthenticationFilter(authenticationManager, jwtUtil)) // JwtAuthenticationFilter 추가
+                .addFilterAt(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JwtRequestFilter(jwtUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class); // JwtRequestFilter 추가
 
         return http.build();
