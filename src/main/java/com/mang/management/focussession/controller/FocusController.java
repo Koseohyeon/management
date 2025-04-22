@@ -43,5 +43,7 @@ public class FocusController {
         return ResponseEntity.ok(focusService.getShortestFocusDay(userDetails.getId()));
     }
 
+
+
 }
 

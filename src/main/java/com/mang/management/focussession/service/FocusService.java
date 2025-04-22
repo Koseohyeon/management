@@ -2,7 +2,9 @@ package com.mang.management.focussession.service;
 
 import com.mang.management.focussession.dto.DailyFocusStat;
 import com.mang.management.focussession.dto.FocusSessionRequest;
+import com.mang.management.focussession.entity.FocusGoal;
 import com.mang.management.focussession.entity.FocusSession;
+import com.mang.management.focussession.repository.FocusGoalRepository;
 import com.mang.management.focussession.repository.FocusSessionRepository;
 import com.mang.management.member.entity.User;
 import com.mang.management.member.repository.UserRepository;
@@ -23,6 +25,7 @@ public class FocusService {
 
     private final FocusSessionRepository focusSessionRepository;
     private final UserRepository userRepository;
+    private final FocusGoalRepository focusGoalRepository;
 
     @Transactional
     public void saveFocusSession(Long userId, FocusSessionRequest request) {
@@ -73,5 +76,15 @@ public class FocusService {
             return new DailyFocusStat(date, total);
         }
         return null;
+    }
+
+    public void setDailyGoal(Long userId, int minutes) {
+        focusGoalRepository.upsertGoal(userId, LocalDate.now(), minutes);
+    }
+
+    public int getTodayGoal(Long userId) {
+        return focusGoalRepository.findByUserIdAndGoalDate(userId, LocalDate.now())
+                .map(FocusGoal::getGoalMinutes)
+                .orElse(0);
     }
 }
