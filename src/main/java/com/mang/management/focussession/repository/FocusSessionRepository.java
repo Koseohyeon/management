@@ -5,8 +5,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface FocusSessionRepository extends JpaRepository<FocusSession, Long> {
     List<FocusSession> findByUserIdAndStartTimeBetween(Long userId, LocalDateTime start, LocalDateTime end);
@@ -30,4 +32,6 @@ public interface FocusSessionRepository extends JpaRepository<FocusSession, Long
             "GROUP BY FUNCTION('DATE', fs.startTime) " +
             "ORDER BY total ASC")
     List<Object[]> findShortestFocusDay(@Param("userId") Long userId);
+
+
 }
