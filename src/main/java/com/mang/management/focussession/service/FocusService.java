@@ -12,9 +12,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -26,6 +24,8 @@ public class FocusService {
     private final FocusSessionRepository focusSessionRepository;
     private final UserRepository userRepository;
     private final FocusGoalRepository focusGoalRepository;
+
+    private static final ZoneId SEOUL_ZONE = ZoneId.of("Asia/Seoul");
 
     @Transactional
     public void saveFocusSession(Long userId, FocusSessionRequest request) {
@@ -47,14 +47,17 @@ public class FocusService {
     }
 
     public List<DailyFocusStat> getDailyStats(Long userId, LocalDate startDate, LocalDate endDate) {
-        LocalDateTime start = startDate.atStartOfDay();
-        LocalDateTime end = endDate.plusDays(1).atStartOfDay();
+        // KST 기준 하루 시작과 끝 계산
+        ZonedDateTime zonedStart = startDate.atStartOfDay(SEOUL_ZONE);
+        ZonedDateTime zonedEnd = endDate.plusDays(1).atStartOfDay(SEOUL_ZONE).minusNanos(1);
 
-        List<Object[]> result = focusSessionRepository.findDailyTotalByUser(userId);
+        LocalDateTime start = zonedStart.toLocalDateTime();
+        LocalDateTime end = zonedEnd.toLocalDateTime();
+
+        List<Object[]> result = focusSessionRepository.findDailyTotalByUserBetween(userId, start, end);
 
         return result.stream()
                 .map(r -> new DailyFocusStat(((java.sql.Date) r[0]).toLocalDate(), (Long) r[1]))
-                .filter(stat -> !stat.getDate().isBefore(startDate) && !stat.getDate().isAfter(endDate))
                 .toList();
     }
 
@@ -79,11 +82,11 @@ public class FocusService {
     }
 
     public void setDailyGoal(Long userId, int minutes) {
-        focusGoalRepository.upsertGoal(userId, LocalDate.now(), minutes);
+        focusGoalRepository.upsertGoal(userId, LocalDate.now(SEOUL_ZONE), minutes);
     }
 
     public int getTodayGoal(Long userId) {
-        return focusGoalRepository.findByUserIdAndGoalDate(userId, LocalDate.now())
+        return focusGoalRepository.findByUserIdAndGoalDate(userId, LocalDate.now(SEOUL_ZONE))
                 .map(FocusGoal::getGoalMinutes)
                 .orElse(0);
     }

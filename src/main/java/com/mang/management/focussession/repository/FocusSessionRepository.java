@@ -16,8 +16,11 @@ public interface FocusSessionRepository extends JpaRepository<FocusSession, Long
     @Query("SELECT FUNCTION('DATE', fs.startTime), SUM(fs.totalMinutes) " +
             "FROM FocusSession fs " +
             "WHERE fs.user.id = :userId " +
+            "AND fs.startTime BETWEEN :start AND :end " +
             "GROUP BY FUNCTION('DATE', fs.startTime)")
-    List<Object[]> findDailyTotalByUser(@Param("userId") Long userId);
+    List<Object[]> findDailyTotalByUserBetween(@Param("userId") Long userId,
+                                               @Param("start") LocalDateTime start,
+                                               @Param("end") LocalDateTime end);
 
     @Query("SELECT FUNCTION('DATE', fs.startTime), SUM(fs.totalMinutes) as total " +
             "FROM FocusSession fs " +
