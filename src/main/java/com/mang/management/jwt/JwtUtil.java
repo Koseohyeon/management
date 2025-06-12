@@ -16,8 +16,8 @@ public class JwtUtil {
     private final Key key;
     private final long expiration;
 
-    public JwtUtil(@Value("${spring.jpa.properties.jwt.secret-key}") String secret,
-                   @Value("${spring.jpa.properties.jwt.access-expiration-time}") long expiration) {
+    public JwtUtil(@Value("${jwt.secret-key}") String secret,
+                   @Value("${jwt.access-expiration-time}") long expiration) {
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
         this.expiration = expiration;
     }
